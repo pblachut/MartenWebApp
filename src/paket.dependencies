@@ -1,5 +1,5 @@
-framework: net461
 redirects: on
 source https://nuget.org/api/v2
 
+nuget Marten
 nuget Microsoft.AspNet.WebApi
