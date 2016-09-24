@@ -2,4 +2,7 @@ redirects: on
 source https://nuget.org/api/v2
 
 nuget Marten
-nuget Microsoft.AspNet.WebApi
+nuget Autofac.WebApi2.Owin
+nuget Microsoft.AspNet.WebApi  
+nuget Microsoft.AspNet.WebApi.Owin  
+nuget Microsoft.Owin.Host.SystemWeb  

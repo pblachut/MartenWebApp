@@ -1,2 +1,5 @@
-Microsoft.AspNet.WebApi
 Marten
+Autofac.WebApi2.Owin
+Microsoft.AspNet.WebApi  
+Microsoft.AspNet.WebApi.Owin  
+Microsoft.Owin.Host.SystemWeb  

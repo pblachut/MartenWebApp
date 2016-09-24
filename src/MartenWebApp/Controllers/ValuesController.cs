@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Autofac;
 using Marten;
 
 namespace MartenWebApp.Controllers
 {
+    [RoutePrefix("api/values")]
     public class ValuesController : ApiController
     {
+        private readonly IUserFactory _userFactory;
+
+        public ValuesController(IUserFactory userFactory)
+        {
+            _userFactory = userFactory;
+        }
+
 
         private IDocumentStore GetDocumentStore()
         {
@@ -18,7 +27,8 @@ namespace MartenWebApp.Controllers
             });
         }
 
-        // GET api/values
+        [HttpGet]
+        [Route("")]
         public async Task<IList<User>> Get()
         {
             var store = GetDocumentStore();
@@ -29,7 +39,8 @@ namespace MartenWebApp.Controllers
             }
         }
 
-        // GET api/values/5
+        [HttpGet]
+        [Route("{id}")]
         public async Task<User> Get(Guid id)
         {
             var store = GetDocumentStore();
@@ -40,28 +51,35 @@ namespace MartenWebApp.Controllers
             }
         }
 
-        // POST api/values
-        public void Post([FromBody]string value)
+        [HttpPost]
+        [Route("")]
+        public void CreateUserFromModel(User user)
         {
             var store = GetDocumentStore();
 
             using (var session = store.LightweightSession())
             {
-                var user = new User { FirstName = "Han", LastName = "Solo" };
                 session.Store(user);
 
                 session.SaveChanges();
             }
         }
 
-        // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
+        [HttpPost]
+        [Route("other")]
+        public void CreateUserFromFactory()
         {
+            var store = GetDocumentStore();
+
+            using (var session = store.LightweightSession())
+            {
+                var user = _userFactory.Create("some first name", "some last name");
+
+                session.Store(user);
+
+                session.SaveChanges();
+            }
         }
 
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-        }
     }
 }
