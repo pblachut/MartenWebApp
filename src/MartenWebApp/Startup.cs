@@ -15,6 +15,8 @@ namespace MartenWebApp
 
             AutofacConfig.Configure(appBuilder, config);
 
+            SwaggerConfig.Configure(config);
+
             WebApiConfig.Configure(appBuilder, config);
         }
 

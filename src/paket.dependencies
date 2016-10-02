@@ -6,3 +6,5 @@ nuget Autofac.WebApi2.Owin
 nuget Microsoft.AspNet.WebApi  
 nuget Microsoft.AspNet.WebApi.Owin  
 nuget Microsoft.Owin.Host.SystemWeb  
+
+nuget Swashbuckle.Core
