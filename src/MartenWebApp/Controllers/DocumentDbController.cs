@@ -7,33 +7,24 @@ using Marten;
 
 namespace MartenWebApp.Controllers
 {
-    [RoutePrefix("api/values")]
-    public class ValuesController : ApiController
+    [RoutePrefix("api/documents")]
+    public class DocumentDbController : ApiController
     {
         private readonly IUserFactory _userFactory;
+        private readonly IDocumentStore _documentStore;
 
-        public ValuesController(IUserFactory userFactory)
+        public DocumentDbController(IUserFactory userFactory, IComponentContext componentContext)
         {
             _userFactory = userFactory;
+            _documentStore = componentContext.ResolveNamed<IDocumentStore>("documentDatabaseDocumentStore");
         }
 
-
-        private IDocumentStore GetDocumentStore()
-        {
-            return DocumentStore.For(options =>
-            {
-                options.Connection("host=localhost;database=marten_test;password=admin;username=postgres");
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-            });
-        }
 
         [HttpGet]
         [Route("")]
         public async Task<IList<User>> Get()
         {
-            var store = GetDocumentStore();
-
-            using (var session = store.LightweightSession())
+            using (var session = _documentStore.LightweightSession())
             {
                 return await session.Query<User>().ToListAsync();
             }
@@ -43,9 +34,7 @@ namespace MartenWebApp.Controllers
         [Route("{id}")]
         public async Task<User> Get(Guid id)
         {
-            var store = GetDocumentStore();
-
-            using (var session = store.LightweightSession())
+            using (var session = _documentStore.LightweightSession())
             {
                 return await session.Query<User>().SingleAsync(user => user.Id == id);
             }
@@ -55,9 +44,8 @@ namespace MartenWebApp.Controllers
         [Route("")]
         public void CreateUserFromModel(User user)
         {
-            var store = GetDocumentStore();
 
-            using (var session = store.LightweightSession())
+            using (var session = _documentStore.LightweightSession())
             {
                 session.Store(user);
 
@@ -69,9 +57,8 @@ namespace MartenWebApp.Controllers
         [Route("other")]
         public void CreateUserFromFactory()
         {
-            var store = GetDocumentStore();
 
-            using (var session = store.LightweightSession())
+            using (var session = _documentStore.LightweightSession())
             {
                 var user = _userFactory.Create("some first name", "some last name");
 

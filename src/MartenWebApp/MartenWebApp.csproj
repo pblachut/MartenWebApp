@@ -65,14 +65,15 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Include="App_Start\AutofacConfig.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\DocumentDbController.cs" />
+    <Compile Include="Controllers\EventStoreController.cs" />
+    <Compile Include="DocumentDatabaseStoreFactory.cs" />
+    <Compile Include="EventStoreFactory.cs" />
     <Compile Include="MartenAppModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
