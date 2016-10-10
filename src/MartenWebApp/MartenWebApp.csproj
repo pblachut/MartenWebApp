@@ -82,6 +82,7 @@
     <Compile Include="Domain\Employee.cs" />
     <Compile Include="Domain\EmployeeCreated.cs" />
     <Compile Include="Domain\EmployeeNameChanged.cs" />
+    <Compile Include="EmployeeReadModel.cs" />
     <Compile Include="EventStoreFactory.cs" />
     <Compile Include="MartenAppModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -30,6 +30,16 @@ namespace MartenWebApp.Controllers
             {
                 return await session.Events.FetchStreamAsync(id);
             }
-        } 
+        }
+
+        [HttpGet]
+        [Route("emplyees/{id}")]
+        public async Task<EmployeeReadModel> GetEmployeeReadModel(Guid id)
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<EmployeeReadModel>().SingleAsync(e => e.Id == id);
+            }
+        }
     }
 }

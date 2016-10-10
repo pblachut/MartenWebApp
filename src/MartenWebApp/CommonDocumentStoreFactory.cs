@@ -21,6 +21,7 @@ namespace MartenWebApp
                 options.AutoCreateSchemaObjects = AutoCreate.All;
                 options.Events.AddEventType(typeof(EmployeeCreated));
                 options.Events.AddEventType(typeof(EmployeeNameChanged));
+                options.Events.InlineProjections.AggregateStreamsWith<EmployeeReadModel>();
             });
         }
     }
