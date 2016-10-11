@@ -4,12 +4,12 @@ namespace MartenWebApp
 {
     public interface IUserFactory
     {
-        User Create(string firstName, string lastName);
+        User Create(string firstName, string lastName, Guid? companyId);
     }
 
     public class UserFactory : IUserFactory
     {
-        public User Create(string firstName, string lastName)
+        public User Create(string firstName, string lastName, Guid? companyId)
         {
             return new User
             {

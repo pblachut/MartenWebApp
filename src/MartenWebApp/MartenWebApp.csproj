@@ -70,6 +70,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="CommonDocumentStoreFactory.cs" />
+    <Compile Include="Company.cs" />
     <Compile Include="Controllers\CommandController.cs" />
     <Compile Include="Controllers\DocumentDbController.cs" />
     <Compile Include="Controllers\EventStoreController.cs" />

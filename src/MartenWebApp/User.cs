@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Marten.Schema;
 
 namespace MartenWebApp
 {
@@ -10,8 +11,9 @@ namespace MartenWebApp
         public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public bool Internal { get; set; }
-        public string UserName { get; set; }
+
+        //[ForeignKey(typeof(Company))]
+        public Guid? CompanyId { get; set; }
 
         public User()
         {

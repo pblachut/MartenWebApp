@@ -21,7 +21,7 @@ namespace MartenWebApp.Controllers
 
 
         [HttpGet]
-        [Route("")]
+        [Route("users")]
         public async Task<IList<User>> Get()
         {
             using (var session = _documentStore.LightweightSession())
@@ -31,7 +31,7 @@ namespace MartenWebApp.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("users/{id}")]
         public async Task<User> Get(Guid id)
         {
             using (var session = _documentStore.LightweightSession())
@@ -41,15 +41,43 @@ namespace MartenWebApp.Controllers
         }
 
         [HttpPost]
-        [Route("")]
+        [Route("users")]
         public void CreateUserFromModel(User user)
         {
-
             using (var session = _documentStore.LightweightSession())
             {
                 session.Store(user);
 
                 session.SaveChanges();
+            }
+        }
+
+        [HttpPost]
+        [Route("companies")]
+        public Guid CreateCompany(string name)
+        {
+            var company = new Company
+            {
+                Name = name
+            };
+
+            using (var session = _documentStore.LightweightSession())
+            {
+                session.Store(company);
+
+                session.SaveChanges();
+            }
+
+            return company.Id;
+        }
+
+        [HttpGet]
+        [Route("companies")]
+        public async Task<IList<Company>> GetComapnies()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<Company>().ToListAsync();
             }
         }
 
@@ -60,7 +88,7 @@ namespace MartenWebApp.Controllers
 
             using (var session = _documentStore.LightweightSession())
             {
-                var user = _userFactory.Create("some first name", "some last name");
+                var user = _userFactory.Create("some first name", "some last name", (Guid?) null);
 
                 session.Store(user);
 
