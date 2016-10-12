@@ -16,6 +16,7 @@ namespace MartenWebApp
                 options.AutoCreateSchemaObjects = AutoCreate.All;
 
                 options.Schema.For<User>().ForeignKey<Company>(x => x.CompanyId);
+                options.Schema.For<User>().ForeignKey<Company>(x => x.CompanyId2);
             });
         }
     }

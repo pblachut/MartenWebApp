@@ -90,7 +90,6 @@
     <Compile Include="Repository.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="User.cs" />
-    <Compile Include="UserFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web.config">

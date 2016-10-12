@@ -15,6 +15,8 @@ namespace MartenWebApp
         //[ForeignKey(typeof(Company))]
         public Guid? CompanyId { get; set; }
 
+        public Guid CompanyId2 { get; set; }
+
         public User()
         {
             Id = Guid.NewGuid();

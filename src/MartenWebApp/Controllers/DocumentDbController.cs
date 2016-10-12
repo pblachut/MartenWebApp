@@ -10,12 +10,10 @@ namespace MartenWebApp.Controllers
     [RoutePrefix("api/documents")]
     public class DocumentDbController : ApiController
     {
-        private readonly IUserFactory _userFactory;
         private readonly IDocumentStore _documentStore;
 
-        public DocumentDbController(IUserFactory userFactory, IComponentContext componentContext)
+        public DocumentDbController(IComponentContext componentContext)
         {
-            _userFactory = userFactory;
             _documentStore = componentContext.ResolveNamed<IDocumentStore>("documentDatabaseDocumentStore");
         }
 
@@ -81,20 +79,6 @@ namespace MartenWebApp.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("other")]
-        public void CreateUserFromFactory()
-        {
-
-            using (var session = _documentStore.LightweightSession())
-            {
-                var user = _userFactory.Create("some first name", "some last name", (Guid?) null);
-
-                session.Store(user);
-
-                session.SaveChanges();
-            }
-        }
 
     }
 }
