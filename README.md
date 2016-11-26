@@ -45,13 +45,30 @@ DocumentStore.For(storeOptions =>
 
 ``` 
 
-### Querying
-
-### Index configuration
-
 ### Database session management
 
-Describe types of sessions (light session, session, dirty tracking).
+It is possible to open modification database session in three different types of mode:
+- `_documentStore.LightweightSession()` 
+
+Session with manually document change tracking. To save or update document in the database `_session.Store(document)` must be called. It does not use [IdentityMap](http://jasperfx.github.io/marten/documentation/documents/advanced/identitymap/) mechanism but it must be noted that it would be applided to all documents loaded using `IDocumentSession.Query<T>()` in this session. 
+
+
+- `_documentStore.OpenSession()`
+ 
+Session with manually document change tracking. It uses IdentityMap by default.
+
+- `_documentStore.DirtyTrackedSession()`
+
+Session with automatically document change tracking. Change in every document loaded to the session would be detected and then `_session.Store(document)` would be invoked automatically. Dirty tracking session is done by comparising JSON documents node by node so enabling it would influence on the performance significantly.
+
+It is possible to determine transaction isolation level in all above session modes. Default level is `ReadCommitted` but it can be set during opening the session e.g. `_store.DirtyTrackedSession(IsolationLevel.Serializable)`.
+
+
+### Querying
+
+
+
+### Index configuration
 
 ### Foreign key feature
 
