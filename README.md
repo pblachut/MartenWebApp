@@ -10,6 +10,8 @@ I`ve heard the first time about Marten on Slack channel when some person shared 
 
 Document database API is very similar to RavenDB what creators of the Marten say openly. They have created Marten as a substitution of RavenDB and that is reason of doing that. 
 
+TODO Tell sth about JSONB https://www.postgresql.org/docs/9.4/static/datatype-json.html
+
 To start using Marten it is needed to create `DocumentStore` object with connection string to Postgres database.
 
 ```csharp
@@ -28,6 +30,8 @@ Static `DocumentStore` class provides two overrides of `For(..)` method. First o
 
 By default Marten creates all relational database schemas automatically. It is very useful during development when you don`t want to care about migrations but may be harmful in production environment. 
 
+TODO Command line tool to schema management http://jasperfx.github.io/marten/documentation/cli/
+
 Marten creates separate tables for each document type. Tables are named using given pattern: `mt_doc_documentType` where `documentType` is the name of the document class. It is possible to override this naming by using attribute or explicit declaration in document store configuration.
 
 ```csharp
@@ -45,7 +49,7 @@ DocumentStore.For(storeOptions =>
 
 ``` 
 
-### Database session management
+### Database session
 
 It is possible to open modification database session in three different types of mode:
 - `_documentStore.LightweightSession()` 
@@ -61,12 +65,27 @@ Session with manually document change tracking. It uses IdentityMap by default.
 
 Session with automatically document change tracking. Change in every document loaded to the session would be detected and then `_session.Store(document)` would be invoked automatically. Dirty tracking session is done by comparising JSON documents node by node so enabling it would influence on the performance significantly.
 
+## Transaction isolation level
+
 It is possible to determine transaction isolation level in all above session modes. Default level is `ReadCommitted` but it can be set during opening the session e.g. `_store.DirtyTrackedSession(IsolationLevel.Serializable)`.
 
+## Read-only database session
+
+There is also separate session which was designed only to access database in read-only mode. To create it, it is needed to call `_documentStore.QuerySession()`. Regarding document cache it works the same as in `_documentStore.LightweightSession()`.
 
 ### Querying
 
+## Linq
 
+TODO supported operations + raw json queries http://jasperfx.github.io/marten/documentation/documents/querying/query_json/
+
+Fetching multiple documents in single call http://jasperfx.github.io/marten/documentation/documents/querying/include/
+
+## Document Hierarchies http://jasperfx.github.io/marten/documentation/documents/advanced/hierarchies/
+
+## SQL and Postresql SQL queries
+
+## Batch queries http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/
 
 ### Index configuration
 
@@ -75,7 +94,7 @@ It is possible to determine transaction isolation level in all above session mod
 
 ### Limitations
 
-Embedded mode, ORM problems 
+Embedded mode, ORM problems, comments made by Ayende
 
 ## Marten as an event store
 
