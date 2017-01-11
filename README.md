@@ -1,6 +1,6 @@
 # Marten - document database and event store 
 
-Document databases became popular in last years. They have a lot of places where they are suitable to use. MongoDb, RavenDb are doing very well on production sites. This time I`ll tell something about Marten which has feature of document database and event store. The new thing is that Marten works on the top of Postgres database.
+Document databases became popular in last years. They have a lot of places where they are suitable to use. RavenDb and many others are doing very well on production sites. This time I`ll tell something about Marten which has feature of document database and event store. The new thing is that Marten works on the top of Postgres database.
 
 ## What is it Marten?
 
@@ -30,7 +30,7 @@ Static `DocumentStore` class provides two overrides of `For(..)` method. First o
 
 By default Marten creates all relational database schemas automatically. It is very useful during development when you don`t want to care about migrations but may be harmful in production environment. 
 
-TODO Command line tool to schema management http://jasperfx.github.io/marten/documentation/cli/
+Marten provides a [tool](http://jasperfx.github.io/marten/documentation/cli/) for managing database scheme. It is a nuget package available to use to apply, verify or generate current configuration of Marten documents into SQL database. It also provides functionality of generating up / down SQL scripts to modify database which can be used in any SQL migrations tool.
 
 Marten creates separate tables for each document type. Tables are named using given pattern: `mt_doc_documentType` where `documentType` is the name of the document class. It is possible to override this naming by using attribute or explicit declaration in document store configuration.
 
