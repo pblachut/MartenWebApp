@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding-left: 12px;
+	line-height: 22px;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark {
+	color: #DDD;
+}
+
+.vscode-high-contrast {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	padding: 10px;
+	overflow-wrap: break-word;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+:not(pre):not(.hljs) > code {
+	color: #A31515;
+	font-size: inherit;
+	font-family: inherit;
+}
+
+</style>
+
+</head>
+<body>
+<h1>Marten - document database and event store</h1>
+<p>Document databases became popular in last years. They have a lot of places where they are suitable to use. MongoDb, RavenDb are doing very well on production sites. This time I`ll tell something about Marten which has feature of document database and event store. The new thing is that Marten works on the top of Postgres database.</p>
+<h2>What is it Marten?</h2>
+<p>I`ve heard the first time about Marten on Slack channel when some person shared the link to <a href="https://jeremydmiller.com/2016/08/18/moving-from-ravendb-to-marten/">this post</a>. <a href="https://jeremydmiller.com/">Jeremy Miller</a> shows why his team decided to abandon RavenDb and setup completly new project with utilizing Postgres relational database. Marten just works as an ORM on Postgres and provides functionality of document database and event store. It is great advantage when single relational database can be used in many ways in the project. But as always, if something is for many things then is the best in nothing.</p>
+<p>Marten uses <a href="https://www.postgresql.org/docs/9.4/static/datatype-json.html">JSONB</a> Postgres type to store documents as default. It gives huge efficiency profits in comparision to normal JSON format. JSONB supports <a href="https://www.postgresql.org/docs/9.1/static/textsearch-indexes.html">GIN</a> indexing with the following <a href="https://www.postgresql.org/docs/9.4/static/functions-json.html#FUNCTIONS-JSONB-OP-TABLE">operators</a>. Postgres gives also possibility to use <a href="https://blog.lateral.io/2015/05/full-text-search-in-milliseconds-with-postgresql/">full-text search</a> within JSON documents.</p>
+<h2>Marten as a document database</h2>
+<p>Document database API is very similar to RavenDB what creators of the Marten say openly. They have created Marten as a substitution of RavenDB and that is reason of doing that.</p>
+<p>To start using Marten it is needed to create <code>DocumentStore</code> object with connection string to Postgres database.</p>
+<pre class="hljs"><code>
+<span class="hljs-keyword">var</span> documentStore = DocumentStore.For(<span class="hljs-string">"connection string"</span>);
+
+<span class="hljs-keyword">var</span> documentStore = DocumentStore.For(storeOptions =&gt;
+{
+    storeOptions.Connection(<span class="hljs-string">"connection string"</span>);
+    <span class="hljs-comment">// the rest of configuration</span>
+});
+
+</code></pre>
+<p>Static <code>DocumentStore</code> class provides two overrides of <code>For(..)</code> method. First one is the simplest one and takes only connection string. Second override is more advanced and gives possibility of additonal configuration using <a href="https://github.com/JasperFx/marten/blob/master/src/Marten/StoreOptions.cs">StoreOptions</a> class.</p>
+<p>By default Marten creates all relational database schemas automatically. It is very useful during development when you don`t want to care about migrations but may be harmful in production environment.</p>
+<p>TODO Command line tool to schema management http://jasperfx.github.io/marten/documentation/cli/</p>
+<p>Marten creates separate tables for each document type. Tables are named using given pattern: <code>mt_doc_documentType</code> where <code>documentType</code> is the name of the document class. It is possible to override this naming by using attribute or explicit declaration in document store configuration.</p>
+<pre class="hljs"><code>
+[DocumentAlias(<span class="hljs-string">"anotheralias)]
+public class User
+{
+
+}
+
+DocumentStore.For(storeOptions =&gt;
+{
+    storeOptions.Schema.For&lt;User&gt;().DocumentAlias("</span>anotheralias);
+});
+
+</code></pre>
+<h3>Database session</h3>
+<p>It is possible to open modification database session in three different types of mode:</p>
+<ul>
+<li><code>_documentStore.LightweightSession()</code></li>
+</ul>
+<p>Session with manually document change tracking. To save or update document in the database <code>_session.Store(document)</code> must be called. It does not use <a href="http://jasperfx.github.io/marten/documentation/documents/advanced/identitymap/">IdentityMap</a> mechanism but it must be noted that it would be applided to all documents loaded using <code>IDocumentSession.Query&lt;T&gt;()</code> in this session.</p>
+<ul>
+<li><code>_documentStore.OpenSession()</code></li>
+</ul>
+<p>Session with manually document change tracking. It uses IdentityMap by default.</p>
+<ul>
+<li><code>_documentStore.DirtyTrackedSession()</code></li>
+</ul>
+<p>Session with automatically document change tracking. Change in every document loaded to the session would be detected and then <code>_session.Store(document)</code> would be invoked automatically. Dirty tracking session is done by comparising JSON documents node by node so enabling it would influence on the performance significantly.</p>
+<h2>Transaction isolation level</h2>
+<p>It is possible to determine transaction isolation level in all above session modes. Default level is <code>ReadCommitted</code> but it can be set during opening the session e.g. <code>_store.DirtyTrackedSession(IsolationLevel.Serializable)</code>.</p>
+<h2>Read-only database session</h2>
+<p>There is also separate session which was designed only to access database in read-only mode. To create it, it is needed to call <code>_documentStore.QuerySession()</code>. Regarding document cache it works the same as in <code>_documentStore.LightweightSession()</code>.</p>
+<h2>Querying</h2>
+<h3>Linq</h3>
+<p>TODO supported operations + raw json queries http://jasperfx.github.io/marten/documentation/documents/querying/query_json/</p>
+<p>Fetching multiple documents in single call http://jasperfx.github.io/marten/documentation/documents/querying/include/</p>
+<h2>Document Hierarchies http://jasperfx.github.io/marten/documentation/documents/advanced/hierarchies/</h2>
+<h3>SQL and Postresql SQL queries</h3>
+<h3>Batch queries http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/</h3>
+<h2>Index configuration</h2>
+<h2>Foreign key feature</h2>
+<h3>Limitations</h3>
+<p>Embedded mode, ORM problems, comments made by Ayende, full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39)</p>
+<h2>Summary</h2>
+<p>In my personal opinion Marten looks very promising as an alternative to other document databases. It gives a foothold for teams which are used to use relational databases. I claim that it is very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. In comparison to other document databases (e.g. RavenDB) it is much less prepared for this. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive</p>
+
+</body>
+</html>
