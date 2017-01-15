@@ -280,7 +280,7 @@ blockquote {
 </head>
 <body>
 <h1>Marten - document database and event store</h1>
-<p>Document databases became popular in last years. They have a lot of places where they are suitable to use. MongoDb, RavenDb are doing very well on production sites. This time I`ll tell something about Marten which has feature of document database and event store. The new thing is that Marten works on the top of Postgres database.</p>
+<p>Document databases became popular in last years. They have a lot of places where they are suitable to use. RavenDb and many others are doing very well on production sites. This time I`ll tell something about Marten which has feature of document database and event store. The new thing is that Marten works on the top of Postgres database.</p>
 <h2>What is it Marten?</h2>
 <p>I`ve heard the first time about Marten on Slack channel when some person shared the link to <a href="https://jeremydmiller.com/2016/08/18/moving-from-ravendb-to-marten/">this post</a>. <a href="https://jeremydmiller.com/">Jeremy Miller</a> shows why his team decided to abandon RavenDb and setup completly new project with utilizing Postgres relational database. Marten just works as an ORM on Postgres and provides functionality of document database and event store. It is great advantage when single relational database can be used in many ways in the project. But as always, if something is for many things then is the best in nothing.</p>
 <p>Marten uses <a href="https://www.postgresql.org/docs/9.4/static/datatype-json.html">JSONB</a> Postgres type to store documents as default. It gives huge efficiency profits in comparision to normal JSON format. JSONB supports <a href="https://www.postgresql.org/docs/9.1/static/textsearch-indexes.html">GIN</a> indexing with the following <a href="https://www.postgresql.org/docs/9.4/static/functions-json.html#FUNCTIONS-JSONB-OP-TABLE">operators</a>. Postgres gives also possibility to use <a href="https://blog.lateral.io/2015/05/full-text-search-in-milliseconds-with-postgresql/">full-text search</a> within JSON documents.</p>
@@ -299,7 +299,7 @@ blockquote {
 </code></pre>
 <p>Static <code>DocumentStore</code> class provides two overrides of <code>For(..)</code> method. First one is the simplest one and takes only connection string. Second override is more advanced and gives possibility of additonal configuration using <a href="https://github.com/JasperFx/marten/blob/master/src/Marten/StoreOptions.cs">StoreOptions</a> class.</p>
 <p>By default Marten creates all relational database schemas automatically. It is very useful during development when you don`t want to care about migrations but may be harmful in production environment.</p>
-<p>TODO Command line tool to schema management http://jasperfx.github.io/marten/documentation/cli/</p>
+<p>Marten provides a <a href="http://jasperfx.github.io/marten/documentation/cli/">tool</a> for managing database scheme. It is a nuget package available to use to apply, verify or generate current configuration of Marten documents into SQL database. It also provides functionality of generating up / down SQL scripts to modify database which can be used in any SQL migrations tool.</p>
 <p>Marten creates separate tables for each document type. Tables are named using given pattern: <code>mt_doc_documentType</code> where <code>documentType</code> is the name of the document class. It is possible to override this naming by using attribute or explicit declaration in document store configuration.</p>
 <pre class="hljs"><code>
 [DocumentAlias(<span class="hljs-string">"anotheralias)]
@@ -328,23 +328,81 @@ DocumentStore.For(storeOptions =&gt;
 <li><code>_documentStore.DirtyTrackedSession()</code></li>
 </ul>
 <p>Session with automatically document change tracking. Change in every document loaded to the session would be detected and then <code>_session.Store(document)</code> would be invoked automatically. Dirty tracking session is done by comparising JSON documents node by node so enabling it would influence on the performance significantly.</p>
-<h2>Transaction isolation level</h2>
+<h3>Session listeners</h3>
+<p>It is possible to add custom session listeners which can intercept specified action during session unit of work. Such listener must implement <code>IDocumentSessionListener</code> interface and must be added during <code>DocumentStore</code> configuration. <code>DocumentSessionListenerBase</code> is a abstract class which can be used to override specified behaviour. It is not need to implement all listener actions.</p>
+<pre class="hljs"><code><span class="hljs-keyword">var</span> listener = <span class="hljs-keyword">new</span> CustomListener();
+
+<span class="hljs-keyword">var</span> store = DocumentStore.For(storeOptions =&gt;
+{
+    storeOptions.Listeners.Add(listener);
+});
+</code></pre>
+<h3>Transaction isolation level</h3>
 <p>It is possible to determine transaction isolation level in all above session modes. Default level is <code>ReadCommitted</code> but it can be set during opening the session e.g. <code>_store.DirtyTrackedSession(IsolationLevel.Serializable)</code>.</p>
-<h2>Read-only database session</h2>
+<h3>Read-only database session</h3>
 <p>There is also separate session which was designed only to access database in read-only mode. To create it, it is needed to call <code>_documentStore.QuerySession()</code>. Regarding document cache it works the same as in <code>_documentStore.LightweightSession()</code>.</p>
+<h3>Optimistic concurrency</h3>
+<p>Marten gives possibility to enable optimistic concurrency feature on specified document type. After enabling it, any document change which would tried to persist is checked firstly if any other change has been done since document was loaded into cache. Such change is detected by comparing version number located in metadata. It is also possible to store document with manually specified version. More information about it can be found in <a href="http://jasperfx.github.io/marten/documentation/documents/advanced/optimistic_concurrency/">documentation</a>.</p>
 <h2>Querying</h2>
 <h3>Linq</h3>
-<p>TODO supported operations + raw json queries http://jasperfx.github.io/marten/documentation/documents/querying/query_json/</p>
-<p>Fetching multiple documents in single call http://jasperfx.github.io/marten/documentation/documents/querying/include/</p>
-<h2>Document Hierarchies http://jasperfx.github.io/marten/documentation/documents/advanced/hierarchies/</h2>
-<h3>SQL and Postresql SQL queries</h3>
-<h3>Batch queries http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/</h3>
+<p>Marten supports <a href="http://jasperfx.github.io/marten/documentation/documents/querying/linq/">synchronous</a> and <a href="http://jasperfx.github.io/marten/documentation/documents/querying/async/">asynchronous</a> linq queries quite well. It includes e.g. searching in child collections, deep queries, distinct, compiled queries, ordering, paging, select many and document value projections. Interesting thing regards paging (using <code>Take()</code>, <code>Skip()</code>) is that it is possible to get total count of all records in single query using <a href="http://jasperfx.github.io/marten/documentation/documents/querying/paging/">Stats()</a> extension. I think that this functionality was influenced by RavenDb which has similar <a href="https://ravendb.net/docs/article-page/3.5/csharp/client-api/session/querying/how-to-get-query-statistics">one</a>.</p>
+<pre class="hljs"><code>TODO example with stats
+</code></pre>
+<p>As other ORMs, Marten gives possibility to use Postgres SQL in queries, including queries with parameters.</p>
+<pre class="hljs"><code><span class="hljs-keyword">var</span> user = session
+                .Query&lt;User&gt;(<span class="hljs-string">"where data -&gt;&gt; 'FirstName' = :FirstName and data -&gt;&gt; 'LastName' = :LastName"</span>, 
+                            <span class="hljs-keyword">new</span> { FirstName = <span class="hljs-string">"Jeremy"</span>, LastName = <span class="hljs-string">"Miller"</span>})
+                .Single();
+</code></pre>
+<p>Marten gives possibility to define <a href="http://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/">foreign keys</a> on documents and based on that has possibility to get multiple documents in single query. <code>Include()</code> linq extension uses SQL join under the hood to achieve that. As default it uses inner join but it is possible to change it explicitly.</p>
+<pre class="hljs"><code>TODO example with Include
+</code></pre>
+<h4>Batch queries</h4>
+<p>It is possible to define set of queries which would be executed in single database call. There are similar soultions in other ORMs which behave like this but many of them work in implicit way (like nHibernate <code>ToFuture(..)</code>). Marten do more less the same but gives explicit way of defining such queries. First it is needed to get instance of <code>IBatchedQuery</code> from the session and then define the queries which should be done in it.</p>
+<p>TODO verify that example</p>
+<pre class="hljs"><code><span class="hljs-keyword">var</span> batch = _session.CreateBatchQuery();
+
+<span class="hljs-keyword">var</span> userPromise = batch.Load&lt;User&gt;(id);
+
+<span class="hljs-keyword">var</span> usersPromise = batch.Query&lt;User&gt;().Where(u =&gt; u.Name == <span class="hljs-string">"Some name"</span>).ToList();
+
+<span class="hljs-keyword">await</span> batch.Execute();
+
+<span class="hljs-keyword">var</span> user = <span class="hljs-keyword">await</span> userPromise;
+<span class="hljs-keyword">var</span> users = <span class="hljs-keyword">await</span> usersPromise;
+
+</code></pre>
+<p>All queries defined within the batch will return the type <code>Task&lt;TResult&gt;</code>. Important thing is that the result of this task can be get only after the batch has been executed.</p>
+<h4>Document hierarchies</h4>
+<p>Document hierarchies mechanism gives possibility to define inheritance between documents to store them in separate tables. To achieve that it is needed to define appriopriate scheme definition during initiating <code>DocumentStore</code> instance. Martren supports one level hierarchies and multi level hierarchies. Both hierarchies types are being configured in similar way.</p>
+<p>TODO verify example + add query example + add comment</p>
+<pre class="hljs"><code><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">User</span> { }
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Employee</span> : <span class="hljs-title">User</span> {}
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Administrator</span> : <span class="hljs-title">User</span> {}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IVehicle</span> {}
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Car</span> : <span class="hljs-title">IVehicle</span> {}
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Toyota</span> : <span class="hljs-title">Car</span> {}
+
+<span class="hljs-keyword">var</span> documentStore = DocumentStore.For(storeOptions =&gt;
+{
+    storeOptions.Schema.For&lt;User&gt;()
+        .AddSubClass&lt;Employee&gt;()
+        .AddSubClass(<span class="hljs-keyword">typeof</span> (Administrator));
+
+    storeOptions.Schema.For&lt;IVehicle&gt;()
+        .AddSubClassHierarchy(
+            <span class="hljs-keyword">typeof</span>(Car),
+            <span class="hljs-keyword">typeof</span>(Toyota)
+        )
+});
+
+</code></pre>
 <h2>Index configuration</h2>
-<h2>Foreign key feature</h2>
-<h3>Limitations</h3>
-<p>Embedded mode, ORM problems, comments made by Ayende, full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39)</p>
+<h2>Limitations</h2>
+<p>Embedded mode, ORM problems, comments made by Ayende, group by missing, full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39)</p>
 <h2>Summary</h2>
-<p>In my personal opinion Marten looks very promising as an alternative to other document databases. It gives a foothold for teams which are used to use relational databases. I claim that it is very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. In comparison to other document databases (e.g. RavenDB) it is much less prepared for this. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive</p>
+<p>In my personal opinion Marten looks very promising as an alternative to other document databases but cannot be compared directly with them. E.g. RavenDb was created from scratch to build document database when Marten is just a software layer on relational database. It gives a foothold for teams which are used to use relational databases. I claim that it might be very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. In comparison to e.g. RavenDB it is much less prepared for this. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive aspect is that community concentrated around Marten (including few company contributions) is quite well organised so it forecasts that project will not die in the nearest future and provided functionalities would be still developed.</p>
 
 </body>
 </html>

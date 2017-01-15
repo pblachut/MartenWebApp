@@ -65,6 +65,19 @@ Session with manually document change tracking. It uses IdentityMap by default.
 
 Session with automatically document change tracking. Change in every document loaded to the session would be detected and then `_session.Store(document)` would be invoked automatically. Dirty tracking session is done by comparising JSON documents node by node so enabling it would influence on the performance significantly.
 
+### Session listeners
+
+It is possible to add custom session listeners which can intercept specified action during session unit of work. Such listener must implement `IDocumentSessionListener` interface and must be added during `DocumentStore` configuration. `DocumentSessionListenerBase` is a abstract class which can be used to override specified behaviour. It is not need to implement all listener actions.
+
+```csharp
+var listener = new CustomListener();
+
+var store = DocumentStore.For(storeOptions =>
+{
+    storeOptions.Listeners.Add(listener);
+});
+```
+
 ### Transaction isolation level
 
 It is possible to determine transaction isolation level in all above session modes. Default level is `ReadCommitted` but it can be set during opening the session e.g. `_store.DirtyTrackedSession(IsolationLevel.Serializable)`.
@@ -73,11 +86,15 @@ It is possible to determine transaction isolation level in all above session mod
 
 There is also separate session which was designed only to access database in read-only mode. To create it, it is needed to call `_documentStore.QuerySession()`. Regarding document cache it works the same as in `_documentStore.LightweightSession()`.
 
+### Optimistic concurrency
+
+Marten gives possibility to enable optimistic concurrency feature on specified document type. After enabling it, any document change which would tried to persist is checked firstly if any other change has been done since document was loaded into cache. Such change is detected by comparing version number located in metadata. It is also possible to store document with manually specified version. More information about it can be found in [documentation](http://jasperfx.github.io/marten/documentation/documents/advanced/optimistic_concurrency/).
+
 ## Querying
 
 ### Linq
 
-Marten supports [synchronous](http://jasperfx.github.io/marten/documentation/documents/querying/linq/) and [asynchronous](http://jasperfx.github.io/marten/documentation/documents/querying/async/) linq queries quite well. It includes e.g. searching in child collections, deep queries, distinct, ordering, paging, select many and document value projections. Interesting thing regards paging (using `Take()`, `Skip()`) is that it is possible to get total count of all records in single query using [Stats()](http://jasperfx.github.io/marten/documentation/documents/querying/paging/) extension. I think that this functionality was influenced by RavenDb which has similar [one](https://ravendb.net/docs/article-page/3.5/csharp/client-api/session/querying/how-to-get-query-statistics).
+Marten supports [synchronous](http://jasperfx.github.io/marten/documentation/documents/querying/linq/) and [asynchronous](http://jasperfx.github.io/marten/documentation/documents/querying/async/) linq queries quite well. It includes e.g. searching in child collections, deep queries, distinct, compiled queries, ordering, paging, select many and document value projections. Interesting thing regards paging (using `Take()`, `Skip()`) is that it is possible to get total count of all records in single query using [Stats()](http://jasperfx.github.io/marten/documentation/documents/querying/paging/) extension. I think that this functionality was influenced by RavenDb which has similar [one](https://ravendb.net/docs/article-page/3.5/csharp/client-api/session/querying/how-to-get-query-statistics).
 
 ```csharp
 TODO example with stats
@@ -92,7 +109,7 @@ var user = session
                 .Single();
 ```
 
-Marten gives possibility to define [foreign keys](http://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/) on documents and based on that has possibility to get multiple documents in single query. `Include()` linq extension uses SQL join under the hood to achieve that. As default it uses inner join but it is possible to change it.
+Marten gives possibility to define [foreign keys](http://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/) on documents and based on that has possibility to get multiple documents in single query. `Include()` linq extension uses SQL join under the hood to achieve that. As default it uses inner join but it is possible to change it explicitly.
 
 ```csharp
 TODO example with Include
@@ -100,14 +117,58 @@ TODO example with Include
 
 #### Batch queries
 
-TODO http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/
+It is possible to define set of queries which would be executed in single database call. There are similar soultions in other ORMs which behave like this but many of them work in implicit way (like nHibernate `ToFuture(..)`). Marten do more less the same but gives explicit way of defining such queries. First it is needed to get instance of `IBatchedQuery` from the session and then define the queries which should be done in it.
 
-#### Document Hierarchies
+TODO verify that example
 
-TODO http://jasperfx.github.io/marten/documentation/documents/advanced/hierarchies/
+```csharp
+var batch = _session.CreateBatchQuery();
 
+var userPromise = batch.Load<User>(id);
+
+var usersPromise = batch.Query<User>().Where(u => u.Name == "Some name").ToList();
+
+await batch.Execute();
+
+var user = await userPromise;
+var users = await usersPromise;
+
+```
+All queries defined within the batch will return the type `Task<TResult>`. Important thing is that the result of this task can be get only after the batch has been executed.
+
+#### Document hierarchies
+
+Document hierarchies mechanism gives possibility to define inheritance between documents to store them in separate tables. To achieve that it is needed to define appriopriate scheme definition during initiating `DocumentStore` instance. Martren supports one level hierarchies and multi level hierarchies. Both hierarchies types are being configured in similar way.
+
+TODO verify example + add query example + add comment
+
+```csharp
+public class User { }
+public class Employee : User {}
+public class Administrator : User {}
+
+public interface IVehicle {}
+public class Car : IVehicle {}
+public class Toyota : Car {}
+
+var documentStore = DocumentStore.For(storeOptions =>
+{
+    storeOptions.Schema.For<User>()
+        .AddSubClass<Employee>()
+        .AddSubClass(typeof (Administrator));
+
+    storeOptions.Schema.For<IVehicle>()
+        .AddSubClassHierarchy(
+            typeof(Car),
+            typeof(Toyota)
+        )
+});
+
+```
 
 ## Index configuration
+
+
 
 ## Limitations
 
