@@ -65,11 +65,11 @@ Session with manually document change tracking. It uses IdentityMap by default.
 
 Session with automatically document change tracking. Change in every document loaded to the session would be detected and then `_session.Store(document)` would be invoked automatically. Dirty tracking session is done by comparising JSON documents node by node so enabling it would influence on the performance significantly.
 
-## Transaction isolation level
+### Transaction isolation level
 
 It is possible to determine transaction isolation level in all above session modes. Default level is `ReadCommitted` but it can be set during opening the session e.g. `_store.DirtyTrackedSession(IsolationLevel.Serializable)`.
 
-## Read-only database session
+### Read-only database session
 
 There is also separate session which was designed only to access database in read-only mode. To create it, it is needed to call `_documentStore.QuerySession()`. Regarding document cache it works the same as in `_documentStore.LightweightSession()`.
 
@@ -77,26 +77,43 @@ There is also separate session which was designed only to access database in rea
 
 ### Linq
 
-TODO supported operations + raw json queries http://jasperfx.github.io/marten/documentation/documents/querying/query_json/
+Marten supports [synchronous](http://jasperfx.github.io/marten/documentation/documents/querying/linq/) and [asynchronous](http://jasperfx.github.io/marten/documentation/documents/querying/async/) linq queries quite well. It includes e.g. searching in child collections, deep queries, distinct, ordering, paging, select many and document value projections. Interesting thing regards paging (using `Take()`, `Skip()`) is that it is possible to get total count of all records in single query using [Stats()](http://jasperfx.github.io/marten/documentation/documents/querying/paging/) extension. I think that this functionality was influenced by RavenDb which has similar [one](https://ravendb.net/docs/article-page/3.5/csharp/client-api/session/querying/how-to-get-query-statistics).
 
-Fetching multiple documents in single call http://jasperfx.github.io/marten/documentation/documents/querying/include/
+```csharp
+TODO example with stats
+```
 
-## Document Hierarchies http://jasperfx.github.io/marten/documentation/documents/advanced/hierarchies/
+As other ORMs, Marten gives possibility to use Postgres SQL in queries, including queries with parameters.
 
-### SQL and Postresql SQL queries
+```csharp
+var user = session
+                .Query<User>("where data ->> 'FirstName' = :FirstName and data ->> 'LastName' = :LastName", 
+                            new { FirstName = "Jeremy", LastName = "Miller"})
+                .Single();
+```
 
-### Batch queries http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/
+Marten gives possibility to define [foreign keys](http://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/) on documents and based on that has possibility to get multiple documents in single query. `Include()` linq extension uses SQL join under the hood to achieve that. As default it uses inner join but it is possible to change it.
+
+```csharp
+TODO example with Include
+```
+
+#### Batch queries
+
+TODO http://jasperfx.github.io/marten/documentation/documents/querying/batched_queries/
+
+#### Document Hierarchies
+
+TODO http://jasperfx.github.io/marten/documentation/documents/advanced/hierarchies/
+
 
 ## Index configuration
 
-## Foreign key feature
+## Limitations
 
-
-### Limitations
-
-Embedded mode, ORM problems, comments made by Ayende, full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39)
+Embedded mode, ORM problems, comments made by Ayende, group by missing, full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39)
 
 ## Summary
 
-In my personal opinion Marten looks very promising as an alternative to other document databases. It gives a foothold for teams which are used to use relational databases. I claim that it is very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. In comparison to other document databases (e.g. RavenDB) it is much less prepared for this. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive 
+In my personal opinion Marten looks very promising as an alternative to other document databases but cannot be compared directly with them. E.g. RavenDb was created from scratch to build document database when Marten is just a software layer on relational database. It gives a foothold for teams which are used to use relational databases. I claim that it might be very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. In comparison to e.g. RavenDB it is much less prepared for this. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive aspect is that community concentrated around Marten (including few company contributions) is quite well organised so it forecasts that project will not die in the nearest future and provided functionalities would be still developed.
 
