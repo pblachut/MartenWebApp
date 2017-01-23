@@ -7,6 +7,7 @@ using System.Web.Http;
 using Autofac;
 using Marten;
 using Marten.Events;
+using Marten.Linq;
 using MartenWebApp.Domain;
 
 namespace MartenWebApp.Controllers
@@ -40,6 +41,31 @@ namespace MartenWebApp.Controllers
             {
                 return await session.Query<EmployeeReadModel>().SingleAsync(e => e.Id == id);
             }
+        }
+
+        [HttpGet]
+        [Route("emplyees")]
+        public async Task<EmployeeListResponse> GetEmployees()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                QueryStatistics statistics;
+
+                var result = await session.Query<EmployeeReadModel>().Stats(out statistics).ToListAsync();
+
+                return new EmployeeListResponse
+                {
+                    Items = result,
+                    TotalCount = statistics.TotalResults
+                };
+
+            }
+        }
+
+        public class EmployeeListResponse
+        {
+            public IList<EmployeeReadModel> Items { get; set; }
+            public long TotalCount { get; set; }
         }
     }
 }

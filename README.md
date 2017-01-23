@@ -97,7 +97,13 @@ Marten gives possibility to enable optimistic concurrency feature on specified d
 Marten supports [synchronous](http://jasperfx.github.io/marten/documentation/documents/querying/linq/) and [asynchronous](http://jasperfx.github.io/marten/documentation/documents/querying/async/) linq queries quite well. It includes e.g. searching in child collections, deep queries, distinct, compiled queries, ordering, paging, select many and document value projections. Interesting thing regards paging (using `Take()`, `Skip()`) is that it is possible to get total count of all records in single query using [Stats()](http://jasperfx.github.io/marten/documentation/documents/querying/paging/) extension. I think that this functionality was influenced by RavenDb which has similar [one](https://ravendb.net/docs/article-page/3.5/csharp/client-api/session/querying/how-to-get-query-statistics).
 
 ```csharp
-TODO example with stats
+QueryStatistics statistics;
+
+var result = await _session.Query<User>()
+                           .Stats(out statistics)
+                           .ToListAsync();
+
+var totalCount = statistics.TotalResults;
 ```
 
 As other ORMs, Marten gives possibility to use Postgres SQL in queries, including queries with parameters.
