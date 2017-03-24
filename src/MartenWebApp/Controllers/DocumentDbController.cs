@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.UI;
 using Autofac;
 using Marten;
 
@@ -30,12 +32,28 @@ namespace MartenWebApp.Controllers
 
         [HttpGet]
         [Route("users/{id}")]
-        public async Task<User> Get(Guid id)
+        public async Task<UserWithCompany> Get(Guid id)
         {
             using (var session = _documentStore.LightweightSession())
             {
-                return await session.Query<User>().SingleAsync(user => user.Id == id);
+                Company company = null;
+
+                var result = await session.Query<User>()
+                    .Include<Company>(user => user.CompanyId2, comp => company = comp)
+                    .SingleAsync(user => user.Id == id);
+
+                return new UserWithCompany
+                {
+                    Company = company,
+                    User = result
+                };
             }
+        }
+
+        public class UserWithCompany
+        {
+            public User User { get; set; }
+            public Company Company { get; set; }
         }
 
         [HttpPost]
@@ -77,6 +95,37 @@ namespace MartenWebApp.Controllers
             {
                 return await session.Query<Company>().ToListAsync();
             }
+        }
+
+        [HttpGet]
+        [Route("batch/{id}")]
+        public async Task<object> GetBatchUsers(Guid id)
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                var batch = session.CreateBatchQuery();
+
+                var userPromise = batch.Load<User>(id);
+
+                var usersPromise = batch.Query<User>().Where(u => u.FirstName.StartsWith("Name")).ToList();
+
+                await batch.Execute();
+
+                var user = await userPromise;
+                var users = await usersPromise;
+
+                return new BatchUsers
+                {
+                    User = user,
+                    Users = users.ToList()
+                };
+            }
+        }
+
+        public class BatchUsers
+        {
+            public User User { get; set; }
+            public List<User> Users { get; set; }
         }
 
 

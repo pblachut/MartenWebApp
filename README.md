@@ -115,29 +115,49 @@ var user = session
                 .Single();
 ```
 
-Marten gives possibility to define [foreign keys](http://jasperfx.github.io/marten/documentation/documents/customizing/foreign_keys/) on documents and based on that has possibility to get multiple documents in single query. `Include()` linq extension uses SQL join under the hood to achieve that. As default it uses inner join but it is possible to change it explicitly.
+Marten has possibility to get multiple documents in single query. `Include()` linq extension uses SQL join under the hood to achieve that. As default it uses inner join but it is possible to change it explicitly. `Include()` construction works in similar way as in RavenDb. It is possible to get single document or documents list.
 
 ```csharp
-TODO example with Include
+using (var session = _documentStore.LightweightSession())
+{
+    Company company = null;
+
+    var result = await session.Query<User>()
+        .Include<Company>(user => user.CompanyId2, comp => company = comp)
+        .SingleAsync(user => user.Id == id);
+
+    return new UserWithCompany
+    {
+        Company = company,
+        User = result
+    };
+}
 ```
 
 #### Batch queries
 
 It is possible to define set of queries which would be executed in single database call. There are similar soultions in other ORMs which behave like this but many of them work in implicit way (like nHibernate `ToFuture(..)`). Marten do more less the same but gives explicit way of defining such queries. First it is needed to get instance of `IBatchedQuery` from the session and then define the queries which should be done in it.
 
-TODO verify that example
-
 ```csharp
-var batch = _session.CreateBatchQuery();
+using (var session = _documentStore.LightweightSession())
+{
+    var batch = session.CreateBatchQuery();
 
-var userPromise = batch.Load<User>(id);
+    var userPromise = batch.Load<User>(id);
 
-var usersPromise = batch.Query<User>().Where(u => u.Name == "Some name").ToList();
+    var usersPromise = batch.Query<User>().Where(u => u.FirstName.StartsWith("Name")).ToList();
 
-await batch.Execute();
+    await batch.Execute();
 
-var user = await userPromise;
-var users = await usersPromise;
+    var user = await userPromise;
+    var users = await usersPromise;
+
+    return new BatchUsers
+    {
+        User = user,
+        Users = users.ToList()
+    };
+}
 
 ```
 All queries defined within the batch will return the type `Task<TResult>`. Important thing is that the result of this task can be get only after the batch has been executed.

@@ -51,7 +51,9 @@ namespace MartenWebApp.Controllers
             {
                 QueryStatistics statistics;
 
-                var result = await session.Query<EmployeeReadModel>().Stats(out statistics).ToListAsync();
+                var result = await session.Query<EmployeeReadModel>()
+                    .Stats(out statistics)
+                    .ToListAsync();
 
                 return new EmployeeListResponse
                 {
