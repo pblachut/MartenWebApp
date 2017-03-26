@@ -194,13 +194,13 @@ var documentStore = DocumentStore.For(storeOptions =>
 
 ## Index configuration
 
-
+TODO describe how to configure indexing.
 
 ## Limitations
 
-Embedded mode, ORM problems, comments made by Ayende, group by missing, full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39)
+ORM problems ,full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39), only c#.
 
 ## Summary
 
-In my personal opinion Marten looks very promising as an alternative to other document databases but cannot be compared directly with them. E.g. RavenDb was created from scratch to build document database when Marten is just a software layer on relational database. It gives a foothold for teams which are used to use relational databases. I claim that it might be very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. In comparison to e.g. RavenDB it is much less prepared for this. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive aspect is that community concentrated around Marten (including few company contributions) is quite well organised so it forecasts that project will not die in the nearest future and provided functionalities would be still developed.
+In my personal opinion Marten looks very promising as an alternative to other document databases but cannot be compared directly with them. [TODO acid](https://ayende.com/blog/164066/ravendb-acid-base) E.g. RavenDb was created from scratch to build document database when Marten is just a software layer on relational database. It gives a foothold for teams which are used to use relational databases. I claim that it might be very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. Advanced features require database scheme changes and I`m not sure if provided [tools](http://jasperfx.github.io/marten/documentation/cli/). Inapriopriate usage may be very harmful especially in production databases. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive aspect is that community concentrated around Marten (including few company contributions) is quite well organised so it forecasts that project will not die and provided functionalities would be still developed and improved.
 
