@@ -169,9 +169,9 @@ Document hierarchies mechanism gives possibility to define inheritance between d
 TODO verify example + add query example + add comment
 
 ```csharp
-public class User { }
-public class Employee : User {}
-public class Administrator : User {}
+public class GeneralUser { }
+public class Employee : GeneralUser {}
+public class Administrator : GeneralUser {}
 
 public interface IVehicle {}
 public class Car : IVehicle {}
@@ -179,7 +179,7 @@ public class Toyota : Car {}
 
 var documentStore = DocumentStore.For(storeOptions =>
 {
-    storeOptions.Schema.For<User>()
+    storeOptions.Schema.For<GeneralUser>()
         .AddSubClass<Employee>()
         .AddSubClass(typeof (Administrator));
 
@@ -191,6 +191,52 @@ var documentStore = DocumentStore.For(storeOptions =>
 });
 
 ```
+
+Tables are created for the most general type. Each table has columns named `mt_doc_type` and `mt_dotnet_doc_type` to select appriopraite rows in the query and to deserialize JSON into appriopriate type. 
+
+get vehicles
+
+```sql
+select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_ivehicle as d
+
+```
+
+get cars
+
+```sql
+select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_ivehicle as d where d.mt_doc_type = 'toyota' or d.mt_doc_type = 'car'
+
+```
+
+get toyotas
+
+```sql
+select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_ivehicle as d where d.mt_doc_type = 'toyota'
+
+```
+
+get general users
+
+```sql
+select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_generaluser as d
+
+```
+
+get admins
+
+```sql
+
+select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_generaluser as d where d.mt_doc_type = 'administrator'
+```
+
+get employees
+
+```sql
+
+select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_generaluser as d where d.mt_doc_type = 'employee'   
+
+```
+
 
 ## Index configuration
 

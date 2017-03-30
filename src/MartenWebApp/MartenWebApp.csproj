@@ -90,6 +90,7 @@
     <Compile Include="Repository.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="WebConsoleMartenLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web.config">

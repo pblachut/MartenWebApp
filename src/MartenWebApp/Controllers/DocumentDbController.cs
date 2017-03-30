@@ -128,6 +128,144 @@ namespace MartenWebApp.Controllers
             public List<User> Users { get; set; }
         }
 
+        [HttpGet]
+        [Route("employees")]
+        public async Task<IList<Employee>> GetEmployees()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<Employee>().ToListAsync();
+            }
+        }
+
+        [HttpPost]
+        [Route("employees")]
+        public async Task<Guid> CreateEmployee(string name)
+        {
+            var employee = new Employee
+            {
+                FirstName = name,
+                LastName = name
+            };
+
+            using (var session = _documentStore.LightweightSession())
+            {
+                session.Store(employee);
+
+                session.SaveChanges();
+            }
+
+            return employee.Id;
+        }
+
+        [HttpPost]
+        [Route("administrators")]
+        public async Task<Guid> CreateAdministrator(string name)
+        {
+            var admin = new Administrator
+            {
+                FirstName = name,
+                LastName = name
+            };
+
+            using (var session = _documentStore.LightweightSession())
+            {
+                session.Store(admin);
+
+                session.SaveChanges();
+            }
+
+            return admin.Id;
+        }
+
+        [HttpGet]
+        [Route("administrators")]
+        public async Task<IList<Administrator>> GetAdmins()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<Administrator>().ToListAsync();
+            }
+        }
+
+        [HttpGet]
+        [Route("generalUsers")]
+        public async Task<IList<GeneralUser>> GetGeneralUsers()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<GeneralUser>().ToListAsync();
+            }
+        }
+
+        [HttpPost]
+        [Route("cars")]
+        public async Task<Guid> CreateCar(string name)
+        {
+            var car = new Car
+            {
+                Name = name
+            };
+
+            using (var session = _documentStore.LightweightSession())
+            {
+                session.Store(car);
+
+                session.SaveChanges();
+            }
+
+            return car.Id;
+        }
+
+        [HttpGet]
+        [Route("cars")]
+        public async Task<IList<Car>> GetCars()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<Car>().ToListAsync();
+            }
+        }
+
+        [HttpPost]
+        [Route("toyotas")]
+        public async Task<Guid> CreateToyota(string name)
+        {
+            var toyota = new Toyota
+            {
+                Name = name
+            };
+
+            using (var session = _documentStore.LightweightSession())
+            {
+                session.Store(toyota);
+
+                session.SaveChanges();
+            }
+
+            return toyota.Id;
+        }
+
+        [HttpGet]
+        [Route("toyotas")]
+        public async Task<IList<Toyota>> GetToyotas()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<Toyota>().ToListAsync();
+            }
+        }
+
+        [HttpGet]
+        [Route("vehicles")]
+        public async Task<IList<IVehicle>> GetVehicles()
+        {
+            using (var session = _documentStore.LightweightSession())
+            {
+                return await session.Query<IVehicle>().ToListAsync();
+            }
+        }
+
 
     }
 }
