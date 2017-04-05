@@ -164,15 +164,16 @@ All queries defined within the batch will return the type `Task<TResult>`. Impor
 
 #### Document hierarchies
 
-Document hierarchies mechanism gives possibility to define inheritance between documents to store them in separate tables. To achieve that it is needed to define appriopriate scheme definition during initiating `DocumentStore` instance. Martren supports one level hierarchies and multi level hierarchies. Both hierarchies types are being configured in similar way.
+Document hierarchies mechanism gives possibility to define inheritance between documents to query them separately. To achieve that it is needed to define appriopriate scheme definition during initiating `DocumentStore` instance. Martren supports one level hierarchies and multi level hierarchies. Both hierarchies types are being configured in similar way.
 
-TODO verify example + add query example + add comment
 
 ```csharp
+// one level
 public class GeneralUser { }
 public class Employee : GeneralUser {}
 public class Administrator : GeneralUser {}
 
+// multi level
 public interface IVehicle {}
 public class Car : IVehicle {}
 public class Toyota : Car {}
@@ -192,61 +193,30 @@ var documentStore = DocumentStore.For(storeOptions =>
 
 ```
 
-Tables are created for the most general type. Each table has columns named `mt_doc_type` and `mt_dotnet_doc_type` to select appriopraite rows in the query and to deserialize JSON into appriopriate type. 
+Table is created for the most general type. It has additional columns named `mt_doc_type` and `mt_dotnet_doc_type` to select appriopriate rows in the query and to deserialize received JSON into correct type. 
 
-get vehicles
-
-```sql
-select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_ivehicle as d
-
-```
-
-get cars
+Quering the `IVehicle` type results in SQL which is the same as for types without hierarchies. The differencies are during performing a query for `Car` or `Toyota` types.
 
 ```sql
-select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_ivehicle as d where d.mt_doc_type = 'toyota' or d.mt_doc_type = 'car'
+select d.data, d.id, d.mt_doc_type, d.mt_version 
+from public.mt_doc_ivehicle as d 
+where d.mt_doc_type = 'toyota' or d.mt_doc_type = 'car'
+
+select d.data, d.id, d.mt_doc_type, d.mt_version 
+from public.mt_doc_ivehicle as d 
+where d.mt_doc_type = 'toyota'
 
 ```
-
-get toyotas
-
-```sql
-select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_ivehicle as d where d.mt_doc_type = 'toyota'
-
-```
-
-get general users
-
-```sql
-select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_generaluser as d
-
-```
-
-get admins
-
-```sql
-
-select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_generaluser as d where d.mt_doc_type = 'administrator'
-```
-
-get employees
-
-```sql
-
-select d.data, d.id, d.mt_doc_type, d.mt_version from public.mt_doc_generaluser as d where d.mt_doc_type = 'employee'   
-
-```
-
-
-## Index configuration
-
-TODO describe how to configure indexing.
-
-## Limitations
-
-ORM problems ,full-text search not implemented yet (https://github.com/JasperFx/marten/issues/39), only c#.
 
 ## Summary
 
-In my personal opinion Marten looks very promising as an alternative to other document databases but cannot be compared directly with them. [TODO acid](https://ayende.com/blog/164066/ravendb-acid-base) E.g. RavenDb was created from scratch to build document database when Marten is just a software layer on relational database. It gives a foothold for teams which are used to use relational databases. I claim that it might be very useful in simple usage scenarios but is not polished enough in more advanced, especially if we think about advanced data quering. Advanced features require database scheme changes and I`m not sure if provided [tools](http://jasperfx.github.io/marten/documentation/cli/). Inapriopriate usage may be very harmful especially in production databases. It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive aspect is that community concentrated around Marten (including few company contributions) is quite well organised so it forecasts that project will not die and provided functionalities would be still developed and improved.
+In my personal opinion Marten looks very promising as an alternative to other document databases but cannot be compared directly with them. E.g. RavenDb was created from scratch to build document database when Marten is just a software layer on relational database. Marten gives a foothold for teams which are used to use relational databases. On the other hand, if we would like to see Marten advantages over RavenDb, Marten is fully [ACID](https://en.wikipedia.org/wiki/ACID). RavenDb supports it only in some [queries](https://ayende.com/blog/164066/ravendb-acid-base).
 
+I claim that Marten might be very useful in simple usage scenarios but is not polished enough in more advanced cases, especially if we think about advanced data quering. 
+Full-text search is doable in Postrgres but it is not supported [yet](https://github.com/JasperFx/marten/issues/39). Queries do not allow to perform `GroupBy` operation. Multitenancy is going to be made in `2.0` version but there are still a lot of [discussions](https://github.com/JasperFx/marten/issues/435) and uncertainty how to achieve that. 
+Most of advanced features require database scheme changes. There are [tools](http://jasperfx.github.io/marten/documentation/cli/) which enables it but they are not ready to use out of the box. Each project must prepare own adjustments to them. Without good practices, inappriopriate usage may be very harmful especially in production databases. 
+
+It must be remembered that Marten is just ORM and has all advantages and drawbacks which ORMs have. Positive aspect is that community concentrated around Marten (including few company contributions) is quite well organised so it forecasts that project will not die and provided functionalities would be still developed and improved.
+
+
+Examples of Marten usages (as a document database and as en event store) can be found [here](https://github.com/pblachut/MartenWebApp).
