@@ -1,7 +1,6 @@
 # Marten - document database and event store 
 
 Document databases became popular in last years. They have a lot of places where they are suitable to use. RavenDb and many others are doing very well on production sites. This time I`ll tell something about Marten which has feature of document database and event store. The new thing is that Marten works on the top of Postgres database.
-===
 
 #### What is it Marten?
 
