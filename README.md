@@ -47,7 +47,7 @@ public class User
 
 DocumentStore.For(storeOptions =>
 {
-    storeOptions.Schema.For<User>().DocumentAlias("anotheralias);
+    storeOptions.Schema.For<User>().DocumentAlias("anotheralias");
 });
 
 ``` 
